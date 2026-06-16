@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Basic Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        /* Calculator interface styled like the reference image */
+        .calculator {
+            background-color: #2196f3;
+            width: 340px;
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Display screen for user inputs and output results */
+        .display {
+            background-color: #f1f8ff;
+            color: #000;
+            font-size: 2.8rem;
+            text-align: right;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            min-height: 80px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        /* CSS Grid System for perfect button alignment */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Interactive buttons styling */
+        button {
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.1s ease, transform 0.05s ease;
+        }
+
+        button:active {
+            background-color: #0d47a1;
+            transform: scale(0.98);
+        }
+
+        /* Operator specific style accent */
+        .operator-btn {
+            background-color: #0d47a1;
+        }
+
+        /* Special utility button actions */
+        .clear-btn {
+            background-color: #e53935;
+            grid-column: span 2;
+        }
+        .clear-btn:active {
+            background-color: #b71c1c;
+        }
+        
+        .equal-btn {
+            background-color: #4caf50;
+        }
+        .equal-btn:active {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <!-- Display Screen -->
+        <div id="screen" class="display">0</div>
+        
+        <!-- Grid layout structure containing digits and operations -->
+        <div class="buttons-grid">
+            <button class="clear-btn" data-type="clear">C</button>
+            <button data-type="operator" class="operator-btn">/</button>
+            <button data-type="operator" class="operator-btn">*</button>
+
+            <button data-type="number">7</button>
+            <button data-type="number">8</button>
+            <button data-type="number">9</button>
+            <button data-type="operator" class="operator-btn">-</button>
+
+            <button data-type="number">4</button>
+            <button data-type="number">5</button>
+            <button data-type="number">6</button>
+            <button data-type="operator" class="operator-btn">+</button>
+
+            <button data-type="number">1</button>
+            <button data-type="number">2</button>
+            <button data-type="number">3</button>
+            <button data-type="equal" class="equal-btn">=</button>
+            
+            <button data-type="number" style="grid-column: span 4;">0</button>
+        </div>
+    </div>
+
+    <script>
+        const screen = document.getElementById('screen');
+        const buttons = document.querySelectorAll('.buttons-grid button');
+        
+        let currentInput = '0';
+        let previousInput = '';
+        let activeOperator = null;
+
+        // Visual display renderer
+        function updateDisplay() {
+            screen.innerText = currentInput;
+        }
+
+        // Loop to assign dynamic Event Listeners to all buttons
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function() {
+                const value = this.innerText;
+                const type = this.getAttribute('data-type');
+
+                // If-Else chain processing user input types
+                if (type === 'number') {
+                    handleNumber(value);
+                } else if (type === 'operator') {
+                    handleOperator(value);
+                } else if (type === 'equal') {
+                    handleCalculate();
+                } else if (type === 'clear') {
+                    handleClear();
+                }
+            });
+        }
+
+        // Handles numeric entries
+        function handleNumber(num) {
+            if (currentInput === '0') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+
+        // Handles basic math operations selection
+        function handleOperator(op) {
+            if (activeOperator !== null) {
+                handleCalculate();
+            }
+            previousInput = currentInput;
+            activeOperator = op;
+            currentInput = '0';
+        }
+
+        // Evaluates calculation expressions using operators and conditional blocks
+        function handleCalculate() {
+            if (activeOperator === null || previousInput === '') return;
+
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            let result = 0;
+
+            if (activeOperator === '+') {
+                result = prev + current;
+            } else if (activeOperator === '-') {
+                result = prev - current;
+            } else if (activeOperator === '*') {
+                result = prev * current;
+            } else if (activeOperator === '/') {
+                if (current === 0) {
+                    result = "Error"; // Avoid division by zero
+                } else {
+                    result = prev / current;
+                }
+            }
+
+            currentInput = result.toString();
+            activeOperator = null;
+            previousInput = '';
+            updateDisplay();
+        }
+
+        // Clears application memory states
+        function handleClear() {
+            currentInput = '0';
+            previousInput = '';
+            activeOperator = null;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
